@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 11:32:17 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/04/29 17:34:12 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/05/09 17:39:05 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ typedef struct	s_character {
 	void	*img;
 	int		with;
 	int		height;
+	int		x; //witdh_matrix;
+	int		y; //height_matrix;
 }				t_character;
 
 typedef struct	s_image {
@@ -39,5 +41,6 @@ typedef struct s_assets {
 typedef struct	s_data {
 	t_assets	img;
 	char		**matrix;
+	
 }				t_data;
 #endif

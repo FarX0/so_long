@@ -6,7 +6,7 @@
 #    By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/17 14:57:10 by tfalchi           #+#    #+#              #
-#    Updated: 2024/04/29 12:37:01 by tfalchi          ###   ########.fr        #
+#    Updated: 2024/05/13 15:24:44 by tfalchi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,9 +51,5 @@ fclean: clean
 	@rm -f $(NAME) $(OBJ)
 
 re: fclean all
-
-redo:
-	@$(CC) $(OBJ) $(MLX) $(MLXFLAGS) -o $(NAME)
-	@echo "\033[35mDone !!\033[0m"
 
 .PHONY: all clean fclean re redo
