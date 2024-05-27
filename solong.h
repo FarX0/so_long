@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 11:32:17 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/05/09 17:39:05 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/05/24 12:53:26 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,18 @@
 # include <stddef.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include "minilibx/mlx.h"
+# include "libft/libft.h"
+# include "libft/get_next_line_bonus.h"
+# include <X11/keysym.h>
 
 typedef struct	s_character {
-	void	*img;
+	void	*img1;
+	void	*img2;
+	void	*img3;
+	void	*imgbase;
 	int		with;
 	int		height;
 	int		x; //witdh_matrix;
@@ -38,9 +47,19 @@ typedef struct s_assets {
 	t_character	character;
 }				t_assets;
 
+typedef struct	s_map {
+	char		**matrix;
+	int			ctrlmy;
+	int			ctrlmx;
+	int			is_map_valid;
+	int			collcount;
+	int			exitcount;
+}				t_map;
+
 typedef struct	s_data {
 	t_assets	img;
-	char		**matrix;
-	
+	void		*mlx;
+	t_map		map;
+	void 		*mlx_win;
 }				t_data;
 #endif
