@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 11:32:17 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/05/24 12:53:26 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/05/28 14:56:11 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@
 # include "libft/get_next_line_bonus.h"
 # include <X11/keysym.h>
 
+# define KEY_ESC 65307
+# define KEY_W 119
+# define KEY_A 97
+# define KEY_S 115
+# define KEY_D 100
+
 typedef struct	s_character {
 	void	*img1;
 	void	*img2;
@@ -29,8 +35,8 @@ typedef struct	s_character {
 	void	*imgbase;
 	int		with;
 	int		height;
-	int		x; //witdh_matrix;
-	int		y; //height_matrix;
+	int		x; //posizione player
+	int		y; //posizione player
 }				t_character;
 
 typedef struct	s_image {
@@ -52,14 +58,16 @@ typedef struct	s_map {
 	int			ctrlmy;
 	int			ctrlmx;
 	int			is_map_valid;
-	int			collcount;
-	int			exitcount;
+	int			countcoll;
+	int			countexit;
+	int 		reachcoll;
+	int			reachexit;
 }				t_map;
 
 typedef struct	s_data {
 	t_assets	img;
 	void		*mlx;
-	t_map		map;
 	void 		*mlx_win;
+	t_map		map;
 }				t_data;
 #endif

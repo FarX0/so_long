@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 15:59:48 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/05/24 13:16:04 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/05/28 15:32:44 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,11 @@ void ft_print_matrix(char **matrix);
 void load_assets(t_data *data);
 int render_next_frame(t_data *data);
 void print_immage(t_data *data, int x, int y);
+void try_reach(t_data *data, int x, int y, char **pos);
+void countfind_map(t_data *data);
+void find_Player(t_data *data);
+void try_move(t_data *data, int y, int x);
+
 
 int main(void)
 {
@@ -34,31 +39,35 @@ int main(void)
 	return (0);
 }
 
-void    try_reach(t_data *data)
+void try_reach(t_data *data, int y, int x, char **map)
 {
-	data->map.exitcount = 0;
-	data->map.collcount = 0;
-	if (data->map.ctrlmy == NULL && data->map.ctrlmx == NULL)
+	static int i = 0;
+	data->map.reachcoll = 0;
+	data->map.reachcoll = 0;
+
+	if(i == 0)
 	{
-		data->map.ctrlmx = data->img.character.x;
-		data->map.ctrlmy = data->img.character.y;
+		find_Player(data);
+		x = data->img.character.x;
+		y = data->img.character.y;
+		i++;
 	}
-    if (data->map.matrix[data->map.ctrlmx][data->map.ctrlmy] == 'E')
-        data->map.exitcount = data->map.exitcount + 1;
-    if (data->map.matrix[data->map.ctrlmx][data->map.ctrlmy] == 'C')
-        data->map.collcount = data->map.collcount + 1;
-    if (data->map.matrix[data->map.ctrlmx][data->map.ctrlmy] == '1' || data->map.matrix[data->map.ctrlmx][data->map.ctrlmy] == '9')
-        return ;
-    data->map.matrix[data->map.ctrlmx][data->map.ctrlmy] = '9';
-    data->map.ctrlmx = data->map.ctrlmx + 1;
-    try_reach(data);
-    data->map.ctrlmy = data->map.ctrlmy + 1;
-    try_reach(data);
-    data->map.ctrlmx = data->map.ctrlmx - 1;
-    try_reach(data);
-    data->map.ctrlmy = data->map.ctrlmy -1;
-    try_reach(data);
-    return ;
+	if (map[y][x] == 'E')
+		data->map.reachcoll = data->map.reachcoll + 1;
+	if (map[y][x] == 'C')
+		data->map.reachcoll = data->map.reachcoll + 1;
+	if (map[y][x] == '1' || map[y][x] == '9')
+		return;
+	map[y][x] = '9';
+	y = y + 1;
+	try_reach(data, y, x, map);
+	x = x + 1;
+	try_reach(data, y, x, map);
+	y = y - 1;
+	try_reach(data, y, x, map);
+	x = x - 1;
+	try_reach(data, y, x, map);
+	return;
 }
 
 int count_lines(char *filename)
@@ -90,7 +99,7 @@ int render_next_frame(t_data *data)
 {
 	int y = 0;
 	int x = 0;
-	
+
 	while (data->map.matrix[y])
 	{
 		while (data->map.matrix[y][x])
@@ -123,9 +132,13 @@ void print_immage(t_data *data, int x, int y)
 		mlx_put_image_to_window(data->mlx, data->mlx_win, data->img.character.img2, (x * 64), (y * 64));
 	else if (data->map.matrix[y][x] == '4')
 		mlx_put_image_to_window(data->mlx, data->mlx_win, data->img.character.img3, (x * 64), (y * 64));
+	else if (data->map.matrix[y][x] == 'C')
+		mlx_put_image_to_window(data->mlx, data->mlx_win, data->img.collectible.img, (x * 64), (y * 64));
+	else if (data->map.matrix[y][x] == 'E')
+		mlx_put_image_to_window(data->mlx, data->mlx_win, data->img.exit.img, (x * 64), (y * 64));
 	else
 	{
-		printf("Error\n");
+		printf("Error A data->map.matrix[y][x] = %c\n", data->map.matrix[y][x]);
 		exit(1);
 	}
 }
@@ -148,22 +161,21 @@ char **map_creation()
 	int y = 0;
 	int fd;
 
-	matrix = malloc(sizeof(t_data));
 	fd = open("maps/map1", O_RDONLY);
 	if (fd == -1)
 	{
-		printf("A\n");
+		printf("fd non trovato\n");
 		return (NULL);
 	}
+	matrix = malloc(sizeof(char *) * (count_lines("maps/map1") + 1));
 
 	char *line = NULL;
-	matrix = malloc(sizeof(char *) * (count_lines("maps/map1") + 1));
 	line = ft_strtrimfree(get_next_line(fd), "\n", &y);
 	x = ft_strlen(line);
 	while (line)
 	{
+		matrix[i] = malloc(sizeof(char *) * (x + 1));
 		matrix[i] = ft_strdup(line);
-		i++;
 		free(line);
 		line = ft_strtrimfree(get_next_line(fd), "\n", &y);
 		if (line == NULL)
@@ -171,48 +183,49 @@ char **map_creation()
 		if (x != (int)ft_strlen(line))
 		{
 			free(line);
-			printf("B\n");
+			printf("mappa non consistente\n");
 			return (NULL);
 		}
 
 		if (line[x] != '\0')
 		{
 			free(line);
-			printf("C, %d, %c -\n", x, line[x]);
+			printf("linea senza null, %d, %c -\n", x, line[x]);
 			return (NULL);
 		}
+		i++;
 	}
 
-	matrix[i] = NULL;
+	matrix[i + 1] = NULL;
 	close(fd);
 	return (matrix);
 }
 
 void map_implementation()
 {
-	t_data data;  /////puntatore da provare.......................................................
+	t_data data; /////puntatore da provare.......................................................
 	data.img.character.with = 64;
 	data.img.character.height = 64;
 	data.mlx = mlx_init();
 	data.mlx_win = mlx_new_window(data.mlx, 1920, 1080, "Hello world!");
-	data.map.matrix = malloc(sizeof(t_data));
+	data.map.matrix = malloc(sizeof(char *) + 1); //da levare il +1?
 	data.map.matrix = map_creation();
 	if (data.map.matrix == NULL)
 	{
-		printf("Error\n");
+		printf("Error map null\n");
 		exit(1);
 	}
-
-	try_reach(&data);
-    data.map.is_map_valid = 1;
-    if (data.map.collcount != collectibles)
-        {
-		printf("Error\n");
+	try_reach(&data, data.img.character.y, data.img.character.x, data.map.matrix);
+	data.map.is_map_valid = 1;
+	printf("countcoll = %d, countexit = %d, reachcoll = %d, reachexit = %d\n", data.map.countcoll, data.map.countexit, data.map.reachcoll, data.map.reachexit);
+	if (data.map.countcoll != data.map.reachcoll)
+	{
+		printf("Error count collect\n");
 		exit(1);
 	}
-    else if (data.map.exitcount != 1)
-        {
-		printf("Error\n");
+	else if (data.map.countexit != 1)
+	{
+		printf("Error count exit\n");
 		exit(1);
 	}
 	load_assets(&data);
@@ -220,8 +233,30 @@ void map_implementation()
 	mlx_hook(data.mlx_win, 17, 1L << 17, ft_closegame, &data);
 	mlx_key_hook(data.mlx_win, ft_key_hook, &data);
 	mlx_loop(data.mlx);
+	/*questa parte al momento non la sta vedendo. da risolvere*/
 	return;
 }
+
+void countfind_map(t_data *data)
+{
+	int y = 0;
+	int x = 0;
+
+	while (data->map.matrix[y])
+	{
+		while (data->map.matrix[y][x])
+		{
+			if (data->map.matrix[y][x] == 'C')
+				data->map.countcoll++;
+			if (data->map.matrix[y][x] == 'E')
+				data->map.countexit++;
+			x++;
+		}
+		x = 0;
+		y++;
+	}
+}
+
 int ft_key_hook(int keysym, t_data *data)
 {
 	if (keysym == XK_Escape)
@@ -231,60 +266,43 @@ int ft_key_hook(int keysym, t_data *data)
 	return (0);
 }
 
+void	try_move(t_data *data, int y, int x)
+{
+	if (y < 0 || x < 0)
+		return;
+	if (data->map.matrix[y][x] == '0' || data->map.matrix[y][x] == 'C')
+	{
+		if (data->map.matrix[y][x] == 'C')
+			// score increase;
+		if (data->map.matrix[y][x] == 'e')
+			// exit level;
+		find_Player(data);
+		data->map.matrix[data->img.character.y][data->img.character.x] = '0';
+		data->map.matrix[y][x] = 'P';
+		data->img.character.y = y;
+		data->img.character.x = x;
+	}
+}
+
 int ft_move_player(t_data *data, int keysym)
 {
 	int y = data->img.character.y;
 	int x = data->img.character.x;
 
-	printf("y = %d, x = %d\n", y, x);
-	printf("keysym = %d\n", keysym);
-	if (keysym == 119)
-	{
-		if (y < 0 || x < 0)
-			return (0);
-		printf("w");
-		if (data->map.matrix[y - 1][x] == '0')
-		{
-			data->map.matrix[y][x] = '0';
-			data->map.matrix[y - 1][x] = 'P';
-		}
-	}
-	if (keysym == 97)
-	{
-		if (y < 0 || x < 0)
-			return (0);
-		printf("a");
-		if (data->map.matrix[y][x - 1] == '0')
-		{
-			data->map.matrix[y][x] = '0';
-			data->map.matrix[y][x - 1] = 'P';
-		}
-	}
+	//printf("y = %d, x = %d\n", y, x);
+	//printf("keysym = %d\n", keysym);
+	if (keysym == KEY_W)
+		try_move(data, y - 1, x);
+	if (keysym == KEY_A)
+		try_move(data, y, x - 1);
 	if (keysym == 115)
-	{
-		if (y < 0 || x < 0)
-			return (0);
-		printf("s");
-		if (data->map.matrix[y + 1][x] == '0')
-		{
-			data->map.matrix[y][x] = '0';
-			data->map.matrix[y + 1][x] = 'P';
-		}
-	}
+		try_move(data, y + 1, x);
 	if (keysym == 100)
-	{
-		if (y < 0 || x < 0)
-			return (0);
-		printf("d");
-		if (data->map.matrix[y][x + 1] && data->map.matrix[y][x + 1] == '0')
-		{
-			data->map.matrix[y][x] = '0';
-			data->map.matrix[y][x + 1] = 'P';
-		}
-	}
+		try_move(data, y, x + 1);
 
 	return (0);
 }
+
 void ft_print_matrix(char **matrix)
 {
 	int i;
@@ -367,4 +385,25 @@ int ft_isinset(char c, char *set)
 		i++;
 	}
 	return (0);
+}
+
+void find_Player(t_data *data)
+{
+	int y = 0;
+	int x = 0;
+
+	while(data->map.matrix[y])
+	{
+		while(data->map.matrix[y][x])
+		{
+			if (data->map.matrix[y][x] == 'P')
+			{
+				data->img.character.x = x;
+				data->img.character.y = y;
+			}
+			x++;
+		}
+		x = 0;
+		y++;
+	}
 }
