@@ -34,6 +34,12 @@ OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
+download:
+				wget -q https://cdn.intra.42.fr/document/document/21656/minilibx-linux.tgz; \
+				tar -xf minilibx-linux.tgz; \
+				mv minilibx-linux minilibx; \
+				rm -f minilibx-linux.tgz; \
+
 $(NAME): $(OBJ)
 	@make all -C $(LIBFT_DIR)
 	@make all -C $(MLX_DIR)

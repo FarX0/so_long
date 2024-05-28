@@ -41,32 +41,29 @@ int main(void)
 
 void try_reach(t_data *data, int y, int x, char **map)
 {
-	static int i = 0;
-	data->map.reachcoll = 0;
-	data->map.reachcoll = 0;
+	static int i;
 
 	if(i == 0)
 	{
+		data->map.reachcoll = 0;
+		data->map.reachexit = 0;
 		find_Player(data);
 		x = data->img.character.x;
 		y = data->img.character.y;
 		i++;
 	}
 	if (map[y][x] == 'E')
-		data->map.reachcoll = data->map.reachcoll + 1;
+		data->map.reachexit = data->map.reachexit + 1;
 	if (map[y][x] == 'C')
 		data->map.reachcoll = data->map.reachcoll + 1;
 	if (map[y][x] == '1' || map[y][x] == '9')
 		return;
 	map[y][x] = '9';
-	y = y + 1;
-	try_reach(data, y, x, map);
-	x = x + 1;
-	try_reach(data, y, x, map);
-	y = y - 1;
-	try_reach(data, y, x, map);
-	x = x - 1;
-	try_reach(data, y, x, map);
+	ft_print_matrix(map);
+	try_reach(data, y + 1, x, map);
+	try_reach(data, y, x + 1, map);
+	try_reach(data, y - 1, x, map);
+	try_reach(data, y, x + 1, map);
 	return;
 }
 
@@ -216,14 +213,18 @@ void map_implementation()
 		exit(1);
 	}
 	try_reach(&data, data.img.character.y, data.img.character.x, data.map.matrix);
+	free(data.map.matrix);
+	data.map.matrix = map_creation();
 	data.map.is_map_valid = 1;
+	data.map.countexit = 1;
 	printf("countcoll = %d, countexit = %d, reachcoll = %d, reachexit = %d\n", data.map.countcoll, data.map.countexit, data.map.reachcoll, data.map.reachexit);
+	// manca la parte che conta uscite e collezzionabili nel file (non considera se raggiungibili o non)
 	if (data.map.countcoll != data.map.reachcoll)
 	{
 		printf("Error count collect\n");
 		exit(1);
 	}
-	else if (data.map.countexit != 1)
+	else if (data.map.reachexit != 1)
 	{
 		printf("Error count exit\n");
 		exit(1);
@@ -313,6 +314,7 @@ void ft_print_matrix(char **matrix)
 		write(1, "\n", 1);
 		i++;
 	}
+	write(1, "\n", 1);
 }
 
 int ft_closegame(t_data *data)
