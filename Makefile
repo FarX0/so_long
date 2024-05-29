@@ -21,8 +21,11 @@ MLX_DIR = ./minilibx
 MLX = $(MLX_DIR)/libmlx.a
 MLXFLAGS = -lX11 -lXext -lm
 
-SRC = so_long.c
-	
+SRC =	utils.c \
+		so_long.c \
+		map_loading.c \
+		game_logic.c
+
 ##	flood_fill.c  ft_error_free.c  ft_errors.c  \
 	map_check.c put_images.c  read_map.c  so_long.c \
 	bad_next_line.c get_entity.c check_this_moves.c \
@@ -51,7 +54,7 @@ $(NAME): $(OBJ)
 
 clean:
 	@make clean -C $(LIBFT_DIR)
-	
+
 fclean: clean
 	@make fclean -C $(LIBFT_DIR)
 	@rm -f $(NAME) $(OBJ)

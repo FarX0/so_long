@@ -70,4 +70,27 @@ typedef struct	s_data {
 	void 		*mlx_win;
 	t_map		map;
 }				t_data;
+
+void		map_implementation();
+char		**map_creation();
+void		*put_xmp(void *mlx, char *filename, int *width, int *height);
+int			ft_key_hook(int keysym, t_data *data);
+int			exit_program();
+int			ft_closegame(t_data *data);
+int			ft_move_player();
+char		*ft_strtrimfree(char *s1, char *set, int *trimmed);
+int			ft_isinset(char c, char *set);
+//static char	*ft_result(char *s1, size_t start, size_t end, int *trimmed);
+int			count_lines(char *filename);
+void		ft_print_matrix(char **matrix);
+void		load_assets(t_data *data);
+int			render_next_frame(t_data *data);
+void		print_immage(t_data *data, int x, int y);
+t_data		*try_reach(t_data *data, int x, int y, char **map);
+void		countfind_map(t_data *data);
+void		find_Player(t_data *data);
+void		try_move(t_data *data, int y, int x);
+char		**dup_matrix(char **matrix);
+t_data		*initialize_data(t_data *data);
+
 #endif
