@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 15:59:48 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/05/28 15:32:44 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/05/29 16:33:43 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,12 @@ void ft_print_matrix(char **matrix);
 void load_assets(t_data *data);
 int render_next_frame(t_data *data);
 void print_immage(t_data *data, int x, int y);
-void try_reach(t_data *data, int x, int y, char **pos);
+t_data *try_reach(t_data *data, int x, int y, char **map);
 void countfind_map(t_data *data);
 void find_Player(t_data *data);
 void try_move(t_data *data, int y, int x);
+char **dup_matrix(char **matrix);
+t_data *initialize_data(t_data *data);
 
 
 int main(void)
@@ -39,17 +41,15 @@ int main(void)
 	return (0);
 }
 
-void try_reach(t_data *data, int y, int x, char **map)
+t_data *try_reach(t_data *data, int y, int x, char **map)
 {
 	static int i;
 
 	if(i == 0)
 	{
-		data->map.reachcoll = 0;
-		data->map.reachexit = 0;
 		find_Player(data);
 		x = data->img.character.x;
-		y = data->img.character.y;
+		y = data->img.character.y;	
 		i++;
 	}
 	if (map[y][x] == 'E')
@@ -57,14 +57,15 @@ void try_reach(t_data *data, int y, int x, char **map)
 	if (map[y][x] == 'C')
 		data->map.reachcoll = data->map.reachcoll + 1;
 	if (map[y][x] == '1' || map[y][x] == '9')
-		return;
+		return(data);
 	map[y][x] = '9';
+	printf("data->map.reachcoll = %d, data->map.reachexit = %d\n", data->map.reachcoll, data->map.reachexit);
 	ft_print_matrix(map);
-	try_reach(data, y + 1, x, map);
-	try_reach(data, y, x + 1, map);
-	try_reach(data, y - 1, x, map);
-	try_reach(data, y, x + 1, map);
-	return;
+	data = try_reach(data, y + 1, x, map);
+	data = try_reach(data, y, x + 1, map);
+	data = try_reach(data, y - 1, x, map);
+	data = try_reach(data, y, x - 1, map);
+	return(data);
 }
 
 int count_lines(char *filename)
@@ -200,42 +201,85 @@ char **map_creation()
 
 void map_implementation()
 {
-	t_data data; /////puntatore da provare.......................................................
-	data.img.character.with = 64;
-	data.img.character.height = 64;
-	data.mlx = mlx_init();
-	data.mlx_win = mlx_new_window(data.mlx, 1920, 1080, "Hello world!");
-	data.map.matrix = malloc(sizeof(char *) + 1); //da levare il +1?
-	data.map.matrix = map_creation();
-	if (data.map.matrix == NULL)
+	t_data *data;
+	char **map;
+
+	data = NULL;
+	data = initialize_data(data);
+	data->mlx = mlx_init();
+	data->mlx_win = mlx_new_window(data->mlx, 1920, 1080, "Hello world!");
+	data->map.matrix = malloc(sizeof(char *) + 1); //da levare il +1?
+	data->map.matrix = map_creation();
+	data->img.character.with = 64;
+	data->img.character.height = 64;
+	if (data->map.matrix == NULL)
 	{
 		printf("Error map null\n");
 		exit(1);
 	}
-	try_reach(&data, data.img.character.y, data.img.character.x, data.map.matrix);
-	free(data.map.matrix);
-	data.map.matrix = map_creation();
-	data.map.is_map_valid = 1;
-	data.map.countexit = 1;
-	printf("countcoll = %d, countexit = %d, reachcoll = %d, reachexit = %d\n", data.map.countcoll, data.map.countexit, data.map.reachcoll, data.map.reachexit);
-	// manca la parte che conta uscite e collezzionabili nel file (non considera se raggiungibili o non)
-	if (data.map.countcoll != data.map.reachcoll)
+	load_assets(data);
+	countfind_map(data);
+	map = dup_matrix(data->map.matrix);
+	data = try_reach(data, 0, 0, map);
+	data->map.is_map_valid = 1;
+	printf("countcoll = %d, countexit = %d, reachcoll = %d, reachexit = %d\n", data->map.countcoll, data->map.countexit, data->map.reachcoll, data->map.reachexit);
+	if (data->map.countcoll != data->map.reachcoll)
 	{
 		printf("Error count collect\n");
 		exit(1);
 	}
-	else if (data.map.reachexit != 1)
+	else if (data->map.countexit != 1)
 	{
 		printf("Error count exit\n");
 		exit(1);
 	}
-	load_assets(&data);
-	mlx_loop_hook(data.mlx, render_next_frame, &data);
-	mlx_hook(data.mlx_win, 17, 1L << 17, ft_closegame, &data);
-	mlx_key_hook(data.mlx_win, ft_key_hook, &data);
-	mlx_loop(data.mlx);
-	/*questa parte al momento non la sta vedendo. da risolvere*/
+	mlx_loop_hook(data->mlx, render_next_frame, data);
+	mlx_hook(data->mlx_win, 17, 1L << 17, ft_closegame, data);
+	mlx_key_hook(data->mlx_win, ft_key_hook, data);
+	mlx_loop(data->mlx);
 	return;
+}
+t_data *initialize_data(t_data *data)
+{
+	data = malloc(sizeof(t_data));
+	data->img.wall.img = NULL;
+	data->img.exit.img = NULL;
+	data->img.collectible.img = NULL;
+	data->img.grass.img = NULL;
+	data->img.character.img1 = NULL;
+	data->img.character.img2 = NULL;
+	data->img.character.img3 = NULL;
+	data->img.character.imgbase = NULL;
+	data->img.character.with = 0;
+	data->img.character.height = 0;
+	data->img.character.x = 0;
+	data->img.character.y = 0;
+	data->mlx = NULL;
+	data->mlx_win = NULL;
+	data->map.matrix = NULL;
+	data->map.ctrlmy = 0;
+	data->map.ctrlmx = 0;
+	data->map.is_map_valid = 0;
+	data->map.countcoll = 0;
+	data->map.countexit = 0;
+	data->map.reachcoll = 0;
+	data->map.reachexit = 0;
+	return (data);
+}
+
+char **dup_matrix(char **matrix)
+{
+	int i = 0;
+	char **new_matrix;
+
+	new_matrix = malloc(sizeof(char *) * (count_lines("maps/map1") + 1));
+	while (matrix[i])
+	{
+		new_matrix[i] = ft_strdup(matrix[i]);
+		i++;
+	}
+	new_matrix[i + 1] = NULL;
+	return (new_matrix);
 }
 
 void countfind_map(t_data *data)
