@@ -1,5 +1,62 @@
 #include "solong.h"
 
+void map_implementation(char **argv)
+{
+	t_data *data;
+	char **mappa;
+	int i = 0;
+
+	data = NULL;
+	data = initialize_data(data);
+	if (data == NULL)
+	{
+		printf("Error\n");
+		ft_closegame(data);
+	}
+	data->mlx = mlx_init();
+	if (data->mlx == NULL)
+	{
+		printf("Error mlx\n");
+		ft_closegame(data);
+	}
+	data->map.matrix = map_creation(argv[1]);
+	if (data->map.matrix == NULL || data->map.matrix[0] == NULL)
+	{
+		printf("Error map\n");
+        ft_closegame(data);
+	}
+	data->mlx_win = mlx_new_window(data->mlx, ((count_columns(data->map.matrix)) * 64), ((count_lines(data->map.matrix)) * 64), "Hello world!");
+	data->img.character.with = 64;
+	data->img.character.height = 64;
+	load_assets(data);
+	countfind_map(data);
+	mappa = dup_matrix(data->map.matrix, argv[1]);
+	data = try_reach(data, 0, 0, mappa);
+	while(mappa[i] != NULL)
+	{
+		free(mappa[i]);
+		i++;
+	}
+	free(mappa);
+	data->map.is_map_valid = 1;
+	printf("countcoll = %d, countexit = %d, reachcoll = %d, reachexit = %d\n", data->map.countcoll, data->map.countexit, data->map.reachcoll, data->map.reachexit);
+	if (data->map.countcoll != data->map.reachcoll)
+	{
+		printf("Error count collect\n");
+		ft_closegame(data);	
+	}
+	else if (data->map.countexit != 1)
+	{
+		printf("Error count exit\n");
+		ft_closegame(data);
+	}
+	mlx_hook(data->mlx_win, 17, 1L << 17, ft_closegame, data);
+	mlx_key_hook(data->mlx_win, ft_key_hook, data);
+	mlx_loop_hook(data->mlx, render_next_frame, data);
+	mlx_loop(data->mlx);
+	return;
+}
+
 void *put_xmp(void *mlx, char *filename, int *width, int *height)
 {
 	void *data;
@@ -10,7 +67,7 @@ void *put_xmp(void *mlx, char *filename, int *width, int *height)
 	return (data);
 }
 
-char **map_creation()
+char **map_creation(char *filename)
 {
 	char **matrix;
 	int x = 0;
@@ -18,20 +75,17 @@ char **map_creation()
 	int y = 0;
 	int fd;
 
-	fd = open("maps/map1", O_RDONLY);
+	matrix = malloc(sizeof(char *) * (count_lines_fd(filename) + 1));
+	if (matrix == NULL)
+		return (matrix);
+	fd = open(filename, O_RDONLY);
 	if (fd == -1)
-	{
-		printf("fd non trovato\n");
-		return (NULL);
-	}
-	matrix = malloc(sizeof(char *) * (count_lines("maps/map1") + 1));
-
+		return (printf("fd non trovato\n"), NULL);
 	char *line = NULL;
 	line = ft_strtrimfree(get_next_line(fd), "\n", &y);
 	x = ft_strlen(line);
 	while (line)
 	{
-		matrix[i] = malloc(sizeof(char *) * (x + 1));
 		matrix[i] = ft_strdup(line);
 		free(line);
 		line = ft_strtrimfree(get_next_line(fd), "\n", &y);
@@ -39,65 +93,22 @@ char **map_creation()
 			break;
 		if (x != (int)ft_strlen(line))
 		{
-			free(line);
 			printf("mappa non consistente\n");
-			return (NULL);
+			matrix[i] = NULL;
+			return (free(line), matrix);
 		}
 
 		if (line[x] != '\0')
 		{
-			free(line);
 			printf("linea senza null, %d, %c -\n", x, line[x]);
-			return (NULL);
+			matrix[i] = NULL;
+			return (free(line), matrix);
 		}
 		i++;
 	}
-
-	matrix[i + 1] = NULL;
-	close(fd);
-	return (matrix);
+	return (close(fd), matrix[i + 1] = NULL, matrix);
 }
 
-void map_implementation()
-{
-	t_data *data;
-	char **map;
-
-	data = NULL;
-	data = initialize_data(data);
-	data->mlx = mlx_init();
-	data->mlx_win = mlx_new_window(data->mlx, 1920, 1080, "Hello world!");
-	data->map.matrix = malloc(sizeof(char *) + 1); //da levare il +1?
-	data->map.matrix = map_creation();
-	data->img.character.with = 64;
-	data->img.character.height = 64;
-	if (data->map.matrix == NULL)
-	{
-		printf("Error map null\n");
-		exit(1);
-	}
-	load_assets(data);
-	countfind_map(data);
-	map = dup_matrix(data->map.matrix);
-	data = try_reach(data, 0, 0, map);
-	data->map.is_map_valid = 1;
-	printf("countcoll = %d, countexit = %d, reachcoll = %d, reachexit = %d\n", data->map.countcoll, data->map.countexit, data->map.reachcoll, data->map.reachexit);
-	if (data->map.countcoll != data->map.reachcoll)
-	{
-		printf("Error count collect\n");
-		exit(1);
-	}
-	else if (data->map.countexit != 1)
-	{
-		printf("Error count exit\n");
-		exit(1);
-	}
-	mlx_loop_hook(data->mlx, render_next_frame, data);
-	mlx_hook(data->mlx_win, 17, 1L << 17, ft_closegame, data);
-	mlx_key_hook(data->mlx_win, ft_key_hook, data);
-	mlx_loop(data->mlx);
-	return;
-}
 t_data *initialize_data(t_data *data)
 {
 	data = malloc(sizeof(t_data));
@@ -105,9 +116,6 @@ t_data *initialize_data(t_data *data)
 	data->img.exit.img = NULL;
 	data->img.collectible.img = NULL;
 	data->img.grass.img = NULL;
-	data->img.character.img1 = NULL;
-	data->img.character.img2 = NULL;
-	data->img.character.img3 = NULL;
 	data->img.character.imgbase = NULL;
 	data->img.character.with = 0;
 	data->img.character.height = 0;
@@ -126,18 +134,23 @@ t_data *initialize_data(t_data *data)
 	return (data);
 }
 
-char **dup_matrix(char **matrix)
+char **dup_matrix(char **matrix, char *filename)
 {
 	int i = 0;
 	char **new_matrix;
-
-	new_matrix = malloc(sizeof(char *) * (count_lines("maps/map1") + 1));
+	new_matrix = malloc(sizeof(char *) * (count_lines_fd(filename) + 1));
 	while (matrix[i])
 	{
 		new_matrix[i] = ft_strdup(matrix[i]);
 		i++;
 	}
-	new_matrix[i + 1] = NULL;
+	while (i != 0 && matrix[i])
+	{
+		free(matrix[i]);
+		i--;
+	}
+	new_matrix[i] = NULL;
+	//free(matrix);
 	return (new_matrix);
 }
 

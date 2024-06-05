@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 11:32:17 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/05/28 14:56:11 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/06/04 16:24:02 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,6 @@
 # define KEY_D 100
 
 typedef struct	s_character {
-	void	*img1;
-	void	*img2;
-	void	*img3;
 	void	*imgbase;
 	int		with;
 	int		height;
@@ -71,8 +68,8 @@ typedef struct	s_data {
 	t_map		map;
 }				t_data;
 
-void		map_implementation();
-char		**map_creation();
+void		map_implementation(char **argv);
+char		**map_creation(char *filename);
 void		*put_xmp(void *mlx, char *filename, int *width, int *height);
 int			ft_key_hook(int keysym, t_data *data);
 int			exit_program();
@@ -81,7 +78,9 @@ int			ft_move_player();
 char		*ft_strtrimfree(char *s1, char *set, int *trimmed);
 int			ft_isinset(char c, char *set);
 //static char	*ft_result(char *s1, size_t start, size_t end, int *trimmed);
-int			count_lines(char *filename);
+int			count_lines_fd(char *filename);
+int			count_lines(char **matrix);
+int			count_columns(char **matrix);
 void		ft_print_matrix(char **matrix);
 void		load_assets(t_data *data);
 int			render_next_frame(t_data *data);
@@ -90,7 +89,7 @@ t_data		*try_reach(t_data *data, int x, int y, char **map);
 void		countfind_map(t_data *data);
 void		find_Player(t_data *data);
 void		try_move(t_data *data, int y, int x);
-char		**dup_matrix(char **matrix);
+char		**dup_matrix(char **matrix, char *filename);
 t_data		*initialize_data(t_data *data);
 
 #endif

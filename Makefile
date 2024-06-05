@@ -6,7 +6,7 @@
 #    By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/17 14:57:10 by tfalchi           #+#    #+#              #
-#    Updated: 2024/05/29 16:24:05 by tfalchi          ###   ########.fr        #
+#    Updated: 2024/06/05 15:43:16 by tfalchi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,6 +36,13 @@ SRC =	utils.c \
 OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
+
+val:
+	@rm -f $(NAME)
+	@$(CC) $(SRC) $(LIBFT) $(MLX) $(MLXFLAGS) -o $(NAME)
+	@echo "\033[34mAre you ready for debugging?\033[0m 😈"
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s --track-fds=yes \
+	./$(NAME) maps/map3
 
 download:
 				wget -q https://cdn.intra.42.fr/document/document/21656/minilibx-linux.tgz; \

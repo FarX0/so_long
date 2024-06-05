@@ -6,14 +6,19 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 15:59:48 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/05/29 16:33:43 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/06/03 14:04:50 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "solong.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
-	map_implementation();
+	if (argc != 2)
+	{
+		printf("Error\n");
+		return (0);
+	}
+	map_implementation(argv);
 	return (0);
 }

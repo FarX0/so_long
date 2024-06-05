@@ -9,21 +9,76 @@ int ft_key_hook(int keysym, t_data *data)
 	return (0);
 }
 
-void	try_move(t_data *data, int y, int x)
+void try_move(t_data *data, int y, int x)
 {
+	static int	i = 0;
+	static int 	j = 0;
 	if (y < 0 || x < 0)
 		return;
-	if (data->map.matrix[y][x] == '0' || data->map.matrix[y][x] == 'C')
+	if (data->map.matrix[y][x] == '0' || data->map.matrix[y][x] == 'C' || data->map.matrix[y][x] == 'E')
 	{
 		if (data->map.matrix[y][x] == 'C')
-			// score increase;
-		if (data->map.matrix[y][x] == 'e')
-			// exit level;
+		{
+			i++;
+			if (i == 1)
+			{
+				mlx_destroy_image(data->mlx, data->img.character.imgbase);
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/1catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+			}
+			else if (i == 2)
+			{
+				mlx_destroy_image(data->mlx, data->img.character.imgbase);
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/2catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+			}
+			else if (i == 3)
+			{
+				mlx_destroy_image(data->mlx, data->img.character.imgbase);
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/3catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+			}
+			if (i == data->map.countcoll)
+			{
+				mlx_destroy_image(data->mlx, data->img.exit.img);
+				data->img.exit.img = put_xmp(data->mlx, "immage/exit.xpm", &data->img.exit.with, &data->img.exit.height);
+			}
+		}
+		
 		find_Player(data);
-		data->map.matrix[data->img.character.y][data->img.character.x] = '0';
+		if (j == 1)
+		{
+			mlx_destroy_image(data->mlx, data->img.character.imgbase);
+			data->map.matrix[data->img.character.y][data->img.character.x] = 'E';
+			j = 0;
+			if(i == 0)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/basic_character.xpm", &data->img.character.with, &data->img.character.height);
+			else if (i == 1)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/1catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+			else if (i == 2)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/2catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+			else if (i >= 3)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/3catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+		}
+		else
+			data->map.matrix[data->img.character.y][data->img.character.x] = '0';
+		printf("i = %d\n", i);
+		if (data->map.matrix[y][x] == 'E')
+		{
+			if (i == data->map.countcoll)
+				ft_closegame(data);
+			mlx_destroy_image(data->mlx, data->img.character.imgbase);
+			if(i == 0)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/basic_character_exit.xpm", &data->img.character.with, &data->img.character.height);
+			else if (i == 1)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/1character_exit.xpm", &data->img.character.with, &data->img.character.height);
+			else if (i == 2)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/2character_exit.xpm", &data->img.character.with, &data->img.character.height);
+			else if (i >= 3)
+				data->img.character.imgbase = put_xmp(data->mlx, "immage/3character_exit.xpm", &data->img.character.with, &data->img.character.height);
+			j = 1;
+		}
 		data->map.matrix[y][x] = 'P';
 		data->img.character.y = y;
 		data->img.character.x = x;
+		ft_print_matrix(data->map.matrix);
 	}
 }
 
@@ -32,8 +87,8 @@ int ft_move_player(t_data *data, int keysym)
 	int y = data->img.character.y;
 	int x = data->img.character.x;
 
-	//printf("y = %d, x = %d\n", y, x);
-	//printf("keysym = %d\n", keysym);
+	// printf("y = %d, x = %d\n", y, x);
+	// printf("keysym = %d\n", keysym);
 	if (keysym == KEY_W)
 		try_move(data, y - 1, x);
 	if (keysym == KEY_A)
@@ -61,8 +116,33 @@ void ft_print_matrix(char **matrix)
 
 int ft_closegame(t_data *data)
 {
-	exit(0);
-	free(data);
+ 	int i = 0;
+	if (data->map.matrix != NULL)
+	{
+		while (i != count_lines(data->map.matrix))
+		{
+			free(data->map.matrix[i]);
+			i++;
+		}
+		free(data->map.matrix);
+	}
+	if (data->img.character.imgbase != NULL)
+		mlx_destroy_image(data->mlx, data->img.character.imgbase);
+	if (data->img.wall.img != NULL)
+		mlx_destroy_image(data->mlx, data->img.wall.img);
+	if (data->img.exit.img != NULL)
+		mlx_destroy_image(data->mlx, data->img.exit.img);
+	if (data->img.collectible.img != NULL)
+		mlx_destroy_image(data->mlx, data->img.collectible.img);
+	if (data->img.grass.img != NULL)
+		mlx_destroy_image(data->mlx, data->img.grass.img);
+	if (data->mlx_win != NULL)
+		mlx_destroy_window(data->mlx, data->mlx_win);
+	if (data->mlx != NULL)
+		mlx_destroy_display(data->mlx);
+	free(data->mlx);
+	free(data); 
+	exit(1);
 	return (0);
 }
 
@@ -79,7 +159,7 @@ static char *ft_result(char *s1, size_t start, size_t end, int *trimmed)
 	}
 	dst = ft_calloc((end - start + 2), sizeof(char));
 	if (dst == NULL)
-		return (NULL);
+		return (free(dst), NULL);
 	while (start <= end)
 	{
 		dst[i] = s1[start];
@@ -136,9 +216,9 @@ void find_Player(t_data *data)
 	int y = 0;
 	int x = 0;
 
-	while(data->map.matrix[y])
+	while (data->map.matrix[y])
 	{
-		while(data->map.matrix[y][x])
+		while (data->map.matrix[y][x])
 		{
 			if (data->map.matrix[y][x] == 'P')
 			{
