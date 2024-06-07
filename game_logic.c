@@ -1,6 +1,18 @@
-#include "solong.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   game_logic.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/07 15:57:50 by tfalchi           #+#    #+#             */
+/*   Updated: 2024/06/07 17:02:24 by tfalchi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-int ft_key_hook(int keysym, t_data *data)
+#include "so_long.h"
+
+int	ft_key_hook(int keysym, t_data *data)
 {
 	if (keysym == XK_Escape)
 		ft_closegame(data);
@@ -9,13 +21,15 @@ int ft_key_hook(int keysym, t_data *data)
 	return (0);
 }
 
-void try_move(t_data *data, int y, int x)
+void	try_move(t_data *data, int y, int x)
 {
 	static int	i = 0;
-	static int 	j = 0;
+	static int	j = 0;
+
 	if (y < 0 || x < 0)
-		return;
-	if (data->map.matrix[y][x] == '0' || data->map.matrix[y][x] == 'C' || data->map.matrix[y][x] == 'E')
+		return ;
+	if (data->map.matrix[y][x] == '0' || data->map.matrix[y][x] == 'C'
+		|| data->map.matrix[y][x] == 'E')
 	{
 		if (data->map.matrix[y][x] == 'C')
 		{
@@ -23,39 +37,53 @@ void try_move(t_data *data, int y, int x)
 			if (i == 1)
 			{
 				mlx_destroy_image(data->mlx, data->img.character.imgbase);
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/1catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/1catcharacter.xpm", &data->img.character.with,
+						&data->img.character.height);
 			}
 			else if (i == 2)
 			{
 				mlx_destroy_image(data->mlx, data->img.character.imgbase);
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/2catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/2catcharacter.xpm", &data->img.character.with,
+						&data->img.character.height);
 			}
 			else if (i == 3)
 			{
 				mlx_destroy_image(data->mlx, data->img.character.imgbase);
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/3catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/3catcharacter.xpm", &data->img.character.with,
+						&data->img.character.height);
 			}
 			if (i == data->map.countcoll)
 			{
 				mlx_destroy_image(data->mlx, data->img.exit.img);
-				data->img.exit.img = put_xmp(data->mlx, "immage/exit.xpm", &data->img.exit.with, &data->img.exit.height);
+				data->img.exit.img = put_xmp(data->mlx, "immage/exit.xpm",
+						&data->img.exit.with, &data->img.exit.height);
 			}
 		}
-		
 		find_Player(data);
 		if (j == 1)
 		{
 			mlx_destroy_image(data->mlx, data->img.character.imgbase);
 			data->map.matrix[data->img.character.y][data->img.character.x] = 'E';
 			j = 0;
-			if(i == 0)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/basic_character.xpm", &data->img.character.with, &data->img.character.height);
+			if (i == 0)
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/basic_character.xpm", &data->img.character.with,
+						&data->img.character.height);
 			else if (i == 1)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/1catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/1catcharacter.xpm", &data->img.character.with,
+						&data->img.character.height);
 			else if (i == 2)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/2catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/2catcharacter.xpm", &data->img.character.with,
+						&data->img.character.height);
 			else if (i >= 3)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/3catcharacter.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/3catcharacter.xpm", &data->img.character.with,
+						&data->img.character.height);
 		}
 		else
 			data->map.matrix[data->img.character.y][data->img.character.x] = '0';
@@ -65,14 +93,22 @@ void try_move(t_data *data, int y, int x)
 			if (i == data->map.countcoll)
 				ft_closegame(data);
 			mlx_destroy_image(data->mlx, data->img.character.imgbase);
-			if(i == 0)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/basic_character_exit.xpm", &data->img.character.with, &data->img.character.height);
+			if (i == 0)
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/basic_character_exit.xpm",
+						&data->img.character.with, &data->img.character.height);
 			else if (i == 1)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/1character_exit.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/1character_exit.xpm", &data->img.character.with,
+						&data->img.character.height);
 			else if (i == 2)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/2character_exit.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/2character_exit.xpm", &data->img.character.with,
+						&data->img.character.height);
 			else if (i >= 3)
-				data->img.character.imgbase = put_xmp(data->mlx, "immage/3character_exit.xpm", &data->img.character.with, &data->img.character.height);
+				data->img.character.imgbase = put_xmp(data->mlx,
+						"immage/3character_exit.xpm", &data->img.character.with,
+						&data->img.character.height);
 			j = 1;
 		}
 		data->map.matrix[y][x] = 'P';
@@ -82,13 +118,13 @@ void try_move(t_data *data, int y, int x)
 	}
 }
 
-int ft_move_player(t_data *data, int keysym)
+int	ft_move_player(t_data *data, int keysym)
 {
-	int y = data->img.character.y;
-	int x = data->img.character.x;
+	int	y;
+	int	x;
 
-	// printf("y = %d, x = %d\n", y, x);
-	// printf("keysym = %d\n", keysym);
+	y = data->img.character.y;
+	x = data->img.character.x;
 	if (keysym == KEY_W)
 		try_move(data, y - 1, x);
 	if (keysym == KEY_A)
@@ -97,13 +133,13 @@ int ft_move_player(t_data *data, int keysym)
 		try_move(data, y + 1, x);
 	if (keysym == 100)
 		try_move(data, y, x + 1);
-
 	return (0);
 }
 
-void ft_print_matrix(char **matrix)
+void	ft_print_matrix(char **matrix)
 {
-	int i;
+	int	i;
+
 	i = 0;
 	while (matrix[i])
 	{
@@ -114,9 +150,11 @@ void ft_print_matrix(char **matrix)
 	write(1, "\n", 1);
 }
 
-int ft_closegame(t_data *data)
+int	ft_closegame(t_data *data)
 {
- 	int i = 0;
+	int	i;
+
+	i = 0;
 	if (data->map.matrix != NULL)
 	{
 		while (i != count_lines(data->map.matrix))
@@ -141,15 +179,15 @@ int ft_closegame(t_data *data)
 	if (data->mlx != NULL)
 		mlx_destroy_display(data->mlx);
 	free(data->mlx);
-	free(data); 
+	free(data);
 	exit(1);
 	return (0);
 }
 
-static char *ft_result(char *s1, size_t start, size_t end, int *trimmed)
+static char	*ft_result(char *s1, size_t start, size_t end, int *trimmed)
 {
-	char *dst;
-	size_t i;
+	char	*dst;
+	size_t	i;
 
 	i = 0;
 	if (!s1[start])
@@ -174,10 +212,10 @@ static char *ft_result(char *s1, size_t start, size_t end, int *trimmed)
 	return (dst);
 }
 
-char *ft_strtrimfree(char *s1, char *set, int *trimmed)
+char	*ft_strtrimfree(char *s1, char *set, int *trimmed)
 {
-	size_t start;
-	size_t end;
+	size_t	start;
+	size_t	end;
 
 	start = 0;
 	end = 0;
@@ -197,9 +235,9 @@ char *ft_strtrimfree(char *s1, char *set, int *trimmed)
 	return (ft_result(s1, start, end, trimmed));
 }
 
-int ft_isinset(char c, char *set)
+int	ft_isinset(char c, char *set)
 {
-	size_t i;
+	size_t	i;
 
 	i = 0;
 	while (set[i])
@@ -211,11 +249,13 @@ int ft_isinset(char c, char *set)
 	return (0);
 }
 
-void find_Player(t_data *data)
+void	find_Player(t_data *data)
 {
-	int y = 0;
-	int x = 0;
+	int	y;
+	int	x;
 
+	y = 0;
+	x = 0;
 	while (data->map.matrix[y])
 	{
 		while (data->map.matrix[y][x])
