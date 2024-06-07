@@ -75,12 +75,12 @@ char **map_creation(char *filename)
 	int y = 0;
 	int fd;
 
-	matrix = malloc(sizeof(char *) * (count_lines_fd(filename) + 1));
-	if (matrix == NULL)
-		return (matrix);
 	fd = open(filename, O_RDONLY);
 	if (fd == -1)
 		return (printf("fd non trovato\n"), NULL);
+	matrix = malloc(sizeof(char *) * (count_lines_fd(filename) + 1));
+	if (matrix == NULL)
+		return (matrix);
 	char *line = NULL;
 	line = ft_strtrimfree(get_next_line(fd), "\n", &y);
 	x = ft_strlen(line);
