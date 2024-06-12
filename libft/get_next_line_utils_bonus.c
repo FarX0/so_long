@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 01:00:00 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/06/05 14:41:44 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/06/12 18:16:19 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ char	*ft_resto(char *old_str)
 	}
 	returnline = malloc(sizeof(char) * (ft_strlen(old_str) - i + 1));
 	if (!returnline)
-		return (0);
+		return (free(old_str), NULL);
 	i++;
 	j = 0;
 	while (old_str[i])

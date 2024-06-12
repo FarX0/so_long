@@ -6,7 +6,7 @@
 #    By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/17 14:57:10 by tfalchi           #+#    #+#              #
-#    Updated: 2024/06/07 11:23:04 by tfalchi          ###   ########.fr        #
+#    Updated: 2024/06/12 18:52:57 by tfalchi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,11 @@ MLXFLAGS = -lX11 -lXext -lm
 SRC =	utils.c \
 		so_long.c \
 		map_loading.c \
-		game_logic.c
+		game_logic.c \
+		utils2.c \
+		utils3.c \
+		utils4.c \
+		utils5.c 
 
 ##	flood_fill.c  ft_error_free.c  ft_errors.c  \
 	map_check.c put_images.c  read_map.c  so_long.c \
@@ -41,7 +45,7 @@ val:
 	@rm -f $(NAME)
 	@$(CC) $(SRC) $(LIBFT) $(MLX) $(MLXFLAGS) -o $(NAME)
 	@echo "\033[34mAre you ready for debugging?\033[0m 😈"
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./$(NAME) maps/map2.ber
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./$(NAME) .vscode/map2.ber
 
 download:
 				wget -q https://cdn.intra.42.fr/document/document/21656/minilibx-linux.tgz; \

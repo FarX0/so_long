@@ -6,7 +6,7 @@
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 15:59:11 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/06/07 17:02:40 by tfalchi          ###   ########.fr       */
+/*   Updated: 2024/06/12 17:41:04 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_data	*try_reach(t_data *data, int y, int x, char **map)
 
 	if (i == 0)
 	{
-		find_Player(data);
+		find_player(data);
 		x = data->img.character.x;
 		y = data->img.character.y;
 		i++;
@@ -92,52 +92,4 @@ void	load_assets(t_data *data)
 	data->img.character.imgbase = put_xmp(data->mlx,
 			"immage/basic_character.xpm", &data->img.character.with,
 			&data->img.character.height);
-}
-
-int	render_next_frame(t_data *data)
-{
-	int	y;
-	int	x;
-
-	y = 0;
-	x = 0;
-	while (data->map.matrix[y])
-	{
-		while (data->map.matrix[y][x])
-		{
-			print_immage(data, x, y);
-			x++;
-		}
-		x = 0;
-		y++;	
-	}
-	return (0);
-}
-
-void	print_immage(t_data *data, int x, int y)
-{
-	if (data->map.matrix[y][x] == '1')
-		mlx_put_image_to_window(data->mlx, data->mlx_win, data->img.wall.img, (x
-				* 64), (y * 64));
-	else if (data->map.matrix[y][x] == '0')
-		mlx_put_image_to_window(data->mlx, data->mlx_win, data->img.grass.img,
-			(x * 64), (y * 64));
-	else if (data->map.matrix[y][x] == 'P')
-	{
-		mlx_put_image_to_window(data->mlx, data->mlx_win,
-			data->img.character.imgbase, (x * 64), (y * 64));
-		data->img.character.x = x;
-		data->img.character.y = y;
-	}
-	else if (data->map.matrix[y][x] == 'C')
-		mlx_put_image_to_window(data->mlx, data->mlx_win,
-			data->img.collectible.img, (x * 64), (y * 64));
-	else if (data->map.matrix[y][x] == 'E')
-		mlx_put_image_to_window(data->mlx, data->mlx_win, data->img.exit.img, (x
-				* 64), (y * 64));
-	else
-	{
-		printf("Error A data->map.matrix[y][x] = %c\n", data->map.matrix[y][x]);
-		exit(1);
-	}
 }

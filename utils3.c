@@ -1,25 +1,50 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   utils3.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tfalchi <tfalchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/18 15:59:48 by tfalchi           #+#    #+#             */
-/*   Updated: 2024/06/12 18:53:05 by tfalchi          ###   ########.fr       */
+/*   Created: 2024/06/12 13:47:06 by tfalchi           #+#    #+#             */
+/*   Updated: 2024/06/12 13:51:39 by tfalchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 
-int	main(int argc, char **argv)
+int	ft_isinset(char c, char *set)
 {
-	if (argc != 2)
-	{
-		ft_printf("Error\n");
-		return (0);
-	}
-	map_implementation(argv);
+	size_t	i;
 
+	i = 0;
+	while (set[i])
+	{
+		if (c == set[i])
+			return (1);
+		i++;
+	}
 	return (0);
+}
+
+void	find_player(t_data *data)
+{
+	int	y;
+	int	x;
+
+	y = 0;
+	x = 0;
+	while (data->map.matrix[y])
+	{
+		while (data->map.matrix[y][x])
+		{
+			if (data->map.matrix[y][x] == 'P')
+			{
+				data->img.character.x = x;
+				data->img.character.y = y;
+			}
+			x++;
+		}
+		x = 0;
+		y++;
+	}
 }
